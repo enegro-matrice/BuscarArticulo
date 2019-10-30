@@ -1,0 +1,35 @@
+{
+  "generator-jhipster": {
+    "promptValues": {
+      "packageName": "com.carpetaciudadana.app"
+    },
+    "jhipsterVersion": "5.8.2",
+    "applicationType": "microservice",
+    "baseName": "CarpetaCiudadanaTemplate",
+    "packageName": "com.carpetaciudadana.app",
+    "packageFolder": "com/carpetaciudadana/app",
+    "serverPort": "8081",
+    "authenticationType": "jwt",
+    "cacheProvider": "hazelcast",
+    "enableHibernateCache": false,
+    "websocket": false,
+    "databaseType": "no",
+    "devDatabaseType": "no",
+    "prodDatabaseType": "no",
+    "searchEngine": false,
+    "messageBroker": false,
+    "serviceDiscoveryType": false,
+    "buildTool": "maven",
+    "enableSwaggerCodegen": false,
+    "jwtSecretKey": "YjBhMTJhMDc3MTY2OWZiNThhZDg1YWY4NTdiNDI0NGE2MmY3MjE1NDI2MGZjNjExZDM1NWQyOTMyYmQzMDUyODFlY2MwNDk4MTE5MDVmN2ZhZTQ1YmFiYmVhNDM5ZDhlZDZkM2NmOTQ5Mjk5N2ZkOGIwZjJjMTIyZWEzMTc5YjI=",
+    "testFrameworks": [],
+    "jhiPrefix": "jhi",
+    "entitySuffix": "",
+    "dtoSuffix": "DTO",
+    "otherModules": [],
+    "enableTranslation": false,
+    "clientPackageManager": "npm",
+    "skipClient": true,
+    "skipUserManagement": true
+  }
+}
