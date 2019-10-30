@@ -114,3 +114,5 @@ jhipster:
 # ===================================================================
 
 # application:
+app:
+    template: C:/Users/desarrollo-ssd/Documents/qa/carpeta-ciudadana-template/src/main/resources/templates/xml/
