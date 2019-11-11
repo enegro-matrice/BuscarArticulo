@@ -116,18 +116,46 @@ public class PdfServiceImpl implements PdfService {
             for (Path path : stream) {
                 if (!Files.isDirectory(path)) {
                     fileList.add(path.getFileName()
-                        .toString());
+						.toString());
                 }
             }
         }
 		return fileList;
 	}
 
-	@Override
 	public String deleteFiles(String name, String template) throws IOException {
-		File fileToDelete = FileUtils.getFile(template + name);
-        boolean success = FileUtils.deleteQuietly(fileToDelete);
-		return Boolean.toString(success);
+		
+		try {
+			FileUtils.getFile(template + name);
+		} catch (Exception e) {
+			return "No se pudo borrar el archivo";
+		}
+		return name;
+	}
+
+	public String setCertificado(MultipartFile files, String template) throws IOException {
+		String name = "CERTIFICADO.ftl";
+		File file = new File(template, name);
+		try (FileOutputStream f = new FileOutputStream(file)) {
+			f.write(files.getBytes());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return name;
+	}
+	public String getCertificado(String template) throws IOException {
+	//	Set<String> fileList = new HashSet<>();
+		String name = "CERTIFICADO.ftl";
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(template))) {
+            for (Path path : stream) {
+                if (!Files.isDirectory(path)) {
+					if( path.getFileName().toString().equals(name)){
+						return " Archivo certificado encontrado";
+					}
+                }
+            }
+        }
+		return " No se encontro Archivo certificado";
 	}
 
 }

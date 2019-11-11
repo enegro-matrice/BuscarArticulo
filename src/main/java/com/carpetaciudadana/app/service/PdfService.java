@@ -17,8 +17,12 @@ public interface PdfService {
 	public File generatePDFFromHTML(String filename, String fileExt, File html, Boolean alineacionHorizontal) throws DocumentException, IOException;
 
 	public String savePNG(MultipartFile files, String template) throws IOException;
+
+	public String setCertificado(MultipartFile files, String template) throws IOException;
 	
 	public Set<String> getListFiles(String template) throws IOException;
+	
+	public String getCertificado(String template) throws IOException;
 
 	public String deleteFiles(String name,String template) throws IOException;
 	

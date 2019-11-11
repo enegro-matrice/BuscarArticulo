@@ -66,8 +66,17 @@ public class TemplateResource {
         ,true).toPath());
     }
     @PostMapping(value = "/file/setmedia", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public String setpngmedia(Model model, @RequestParam(value = "files", required = true) MultipartFile files) throws IOException{
+    public String setpngmedia(@RequestParam(value = "files", required = true) MultipartFile files) throws IOException{
         return pdfService.savePNG(files, template) + " fue guardado con exito";
+    }
+    @PostMapping(value = "/file/setHtml", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public String setCertificado(@RequestParam(value = "files", required = true) MultipartFile files) throws IOException{
+        return pdfService.setCertificado(files,template) + " fue guardado con exito";
+    }
+    @GetMapping(value = "/file/setHtml")
+    public String getCertificado() throws IOException{
+       
+        return pdfService.getCertificado(template);
     }
     @GetMapping(value = "/file/DeletMedia")
     public Set<String> getListFiles() throws IOException{
