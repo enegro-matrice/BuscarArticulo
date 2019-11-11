@@ -5,6 +5,7 @@ import com.carpetaciudadana.app.service.PdfService;
 import com.carpetaciudadana.app.service.dto.TituloCedelDTOpdf;
 import com.itextpdf.text.DocumentException;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,8 +23,12 @@ import org.springframework.http.MediaType;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.Set;
 
 import freemarker.template.TemplateException;
 import io.swagger.models.Model;
@@ -60,10 +65,10 @@ public class TemplateResource {
         ("CERTIFICADO_CEDEL.ftl", template, new TituloCedelDTOpdf(new EstudianteCedel().apellido("Pizarro").nombre("Maximiliano").dni("36771843").curso("Apache Freemarker").fechaFin("201812").duracion("1").toJson(),template).toString())
         ,true).toPath());
     }
-    @PutMapping(value = "/file/setmedia", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/file/setmedia", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public String setpngmedia(Model model, @RequestParam(value = "files", required = true) MultipartFile files) throws IOException{
 
-        File file = new File("F:/Carpeta-cuidadana/carpeta-ciudadana-template/src/main/resources/templates/xml/",
+        File file = new File(template,
             files.getOriginalFilename());
         try (FileOutputStream f = new FileOutputStream(file)){
             f.write(files.getBytes());
@@ -75,4 +80,24 @@ public class TemplateResource {
         //files[0].transferTo(new File(filepath));
         return files.getOriginalFilename();
     }
+    @GetMapping(value = "/file/DeletMedia")
+    public Set<String> getListFiles() throws IOException{
+        Set<String> fileList = new HashSet<>();
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(template))) {
+            for (Path path : stream) {
+                if (!Files.isDirectory(path)) {
+                    fileList.add(path.getFileName()
+                        .toString());
+                }
+            }
+        }
+        return fileList;
+    }
+    @PostMapping(value = "/file/DeletMedia")
+    public String DelMedia(@RequestParam(value = "name",required = true) String name) throws IOException{
+        File fileToDelete = FileUtils.getFile(template + name);
+        boolean success = FileUtils.deleteQuietly(fileToDelete);
+        return "borrado"+ success;
+    }
+  
 }
