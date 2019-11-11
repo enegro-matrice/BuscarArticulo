@@ -11,15 +11,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import freemarker.template.TemplateException;
+import io.swagger.models.Model;
 
 
 
@@ -49,5 +52,15 @@ public class TemplateResource {
         pdfService.createHtmlWithData
         ("CERTIFICADO_CEDEL.ftl", template, new TituloCedelDTOpdf(new EstudianteCedel().apellido("Pizarro").nombre("Maximiliano").dni("36771843").curso("Apache Freemarker").fechaFin("201812").duracion("1").toJson(),template).toString())
         ,true).toPath());
+    }
+    @PutMapping(value = "/file/setmedia", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public String setpngmedia(Model model, @RequestParam(value = "files", required = true) MultipartFile files[]) {
+              //  model.addAttribute();
+          /*      return Files.readAllBytes(pdfService.generatePDFFromHTML
+        ("Certificado Cedel",".pdf",
+        pdfService.createHtmlWithData
+        ("CERTIFICADO_intento2.ftl", template, new TituloCedelDTOpdf(new EstudianteCedel().apellido("Pizarro").nombre("Maximiliano").dni("36771843").curso("Apache Freemarker").fechaFin("201812").duracion("1").toJson(),template).toString())
+        ,true).toPath());*/
+        return "Entro";
     }
 }
