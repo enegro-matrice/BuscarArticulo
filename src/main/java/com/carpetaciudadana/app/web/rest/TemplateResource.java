@@ -67,37 +67,15 @@ public class TemplateResource {
     }
     @PostMapping(value = "/file/setmedia", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public String setpngmedia(Model model, @RequestParam(value = "files", required = true) MultipartFile files) throws IOException{
-
-        File file = new File(template,
-            files.getOriginalFilename());
-        try (FileOutputStream f = new FileOutputStream(file)){
-            f.write(files.getBytes());
-         } catch (Exception e) {
-           e.printStackTrace();
-        }
-        //Path filepath = Paths.get("/", files.getOriginalFilename());
-        //String filePath = request.getServletContext().getRealPath("/"); 
-        //files[0].transferTo(new File(filepath));
-        return files.getOriginalFilename();
+        return pdfService.savePNG(files, template) + " fue guardado con exito";
     }
     @GetMapping(value = "/file/DeletMedia")
     public Set<String> getListFiles() throws IOException{
-        Set<String> fileList = new HashSet<>();
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(template))) {
-            for (Path path : stream) {
-                if (!Files.isDirectory(path)) {
-                    fileList.add(path.getFileName()
-                        .toString());
-                }
-            }
-        }
-        return fileList;
+        return pdfService.getListFiles(template);
     }
     @PostMapping(value = "/file/DeletMedia")
     public String DelMedia(@RequestParam(value = "name",required = true) String name) throws IOException{
-        File fileToDelete = FileUtils.getFile(template + name);
-        boolean success = FileUtils.deleteQuietly(fileToDelete);
-        return "borrado"+ success;
+        return pdfService.deleteFiles(name, template);
     }
   
 }

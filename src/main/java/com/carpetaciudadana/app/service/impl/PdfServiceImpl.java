@@ -8,17 +8,25 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.file.DirectoryStream;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
+import org.apache.commons.io.FileUtils;
 import org.bouncycastle.util.encoders.Base64;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.io.Files;
+//import com.google.common.io.Files;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.PageSize;
@@ -33,8 +41,6 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 
-
-
 /**
  * Servicios para guardar informacion en storage. Implementacion S3
  * 
@@ -43,11 +49,6 @@ import freemarker.template.TemplateExceptionHandler;
 @Service
 public class PdfServiceImpl implements PdfService {
 
-	/**
-	 * A partir de un Template y datos en JSON genera un HTML
-	 * 
-	 * @return
-	 */
 	public File createHtmlWithData(String templateFile, String pathTemplates, String jsonData)
 			throws IOException, TemplateException {
 
@@ -73,32 +74,60 @@ public class PdfServiceImpl implements PdfService {
 		return tempFile;
 	}
 
-	/**
-	 * A partir de un HTML genera un PDF
-	 * 
-	 * @return
-	 */
-	public File generatePDFFromHTML(String filename, String fileExt,File html, Boolean alineacionHorizontal) throws DocumentException, IOException {
+	public File generatePDFFromHTML(String filename, String fileExt, File html, Boolean alineacionHorizontal)
+			throws DocumentException, IOException {
 		File pdfFile = File.createTempFile(filename, fileExt);
 
 		DataOutputStream stream = new DataOutputStream(new FileOutputStream(pdfFile));
 		Document document = new Document();
-		if(alineacionHorizontal)
+		if (alineacionHorizontal)
 			document.setPageSize(PageSize.A4.rotate());
 		PdfWriter writer = PdfWriter.getInstance(document, stream);
-		if(alineacionHorizontal)
+		if (alineacionHorizontal)
 			writer.addPageDictEntry(PdfName.ROTATE, PdfPage.LANDSCAPE);
-		document.open();		
+		document.open();
 		XMLWorkerHelper.getInstance().parseXHtml(writer, document, new FileInputStream(html));
 		document.close();
 
 		return pdfFile;
-	}	
-
-	
-	public File generatePDFFromBase64(String filename, String fileExt,String file) throws IOException {
-		File pdfFile=File.createTempFile(filename, fileExt);
-		Files.write(Base64.decode(file), pdfFile);
-		return pdfFile;
 	}
+
+	public File generatePDFFromBase64(String filename, String fileExt, String file) throws IOException {
+	//	File pdfFile = File.createTempFile(filename, fileExt);
+		//Files.write(Base64.decode(file), pdfFile);
+	//	return pdfFile;
+	return null;
+	}
+
+	public String savePNG(MultipartFile files, String template) throws IOException {
+		File file = new File(template, files.getOriginalFilename());
+		try (FileOutputStream f = new FileOutputStream(file)) {
+			f.write(files.getBytes());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return files.getOriginalFilename();
+	}
+
+	public Set<String> getListFiles(String template) throws IOException {
+		Set<String> fileList = new HashSet<>();
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(template))) {
+            for (Path path : stream) {
+                if (!Files.isDirectory(path)) {
+                    fileList.add(path.getFileName()
+                        .toString());
+                }
+            }
+        }
+		return fileList;
+	}
+
+	@Override
+	public String deleteFiles(String name, String template) throws IOException {
+		File fileToDelete = FileUtils.getFile(template + name);
+        boolean success = FileUtils.deleteQuietly(fileToDelete);
+		return Boolean.toString(success);
+	}
+
 }
