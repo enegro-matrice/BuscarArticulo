@@ -1,6 +1,5 @@
 package com.carpetaciudadana.app.service.impl;
 
-import com.carpetaciudadana.app.service.PdfService;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,32 +8,30 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
-import org.apache.commons.io.FileUtils;
-import org.bouncycastle.util.encoders.Base64;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-import org.xhtmlrenderer.pdf.ITextRenderer;
-
+import com.carpetaciudadana.app.service.PdfService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 //import com.google.common.io.Files;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.PageSize;
-import com.itextpdf.text.pdf.PdfAction;
 import com.itextpdf.text.pdf.PdfName;
 import com.itextpdf.text.pdf.PdfPage;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.tool.xml.XMLWorkerHelper;
+
+import org.apache.commons.io.FileUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -124,38 +121,45 @@ public class PdfServiceImpl implements PdfService {
 	}
 
 	public String deleteFiles(String name, String template) throws IOException {
-		
+		File fileToDelete = FileUtils.getFile(template + name);
 		try {
-			FileUtils.getFile(template + name);
+			FileUtils.deleteQuietly(fileToDelete);
+			return name + " Eliminado";
 		} catch (Exception e) {
 			return "No se pudo borrar el archivo";
 		}
-		return name;
+		
 	}
 
-	public String setCertificado(MultipartFile files, String template) throws IOException {
-		String name = "CERTIFICADO.ftl";
+/*	public String setCertificado(MultipartFile files, String template) throws IOException {
+		String name = "CERTIFICADO_CEDEL.ftl";
 		File file = new File(template, name);
 		try (FileOutputStream f = new FileOutputStream(file)) {
 			f.write(files.getBytes());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return name;
-	}
-	public String getCertificado(String template) throws IOException {
-	//	Set<String> fileList = new HashSet<>();
-		String name = "CERTIFICADO.ftl";
+		return files.getOriginalFilename();
+	}*/
+
+	public Set<String> getCertificado(String template) throws IOException {
+		Set<String> fileList = new HashSet<>();
+		String name = ".ftl";
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(template))) {
             for (Path path : stream) {
                 if (!Files.isDirectory(path)) {
-					if( path.getFileName().toString().equals(name)){
-						return " Archivo certificado encontrado";
+					String pathh = path.getFileName().toString();
+					String result = pathh.substring(pathh.length() - 4);
+					//System.out.println(pathh);
+					//System.out.println(result);
+					if(result.equals(name)){
+						fileList.add(path.getFileName()
+						.toString());
 					}
                 }
             }
         }
-		return " No se encontro Archivo certificado";
+		return fileList;
 	}
 
 }

@@ -18,11 +18,11 @@ public interface PdfService {
 
 	public String savePNG(MultipartFile files, String template) throws IOException;
 
-	public String setCertificado(MultipartFile files, String template) throws IOException;
+//	public String setCertificado(MultipartFile files, String template) throws IOException;
 	
 	public Set<String> getListFiles(String template) throws IOException;
 	
-	public String getCertificado(String template) throws IOException;
+	public Set<String> getCertificado(String template) throws IOException;
 
 	public String deleteFiles(String name,String template) throws IOException;
 	

@@ -1,37 +1,26 @@
 package com.carpetaciudadana.app.web.rest;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.Set;
+
 import com.carpetaciudadana.app.domain.EstudianteCedel;
 import com.carpetaciudadana.app.service.PdfService;
 import com.carpetaciudadana.app.service.dto.TituloCedelDTOpdf;
 import com.itextpdf.text.DocumentException;
 
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashSet;
-import java.util.Set;
 
 import freemarker.template.TemplateException;
-import io.swagger.models.Model;
 
 
 
@@ -69,16 +58,15 @@ public class TemplateResource {
     public String setpngmedia(@RequestParam(value = "files", required = true) MultipartFile files) throws IOException{
         return pdfService.savePNG(files, template) + " fue guardado con exito";
     }
-    @PostMapping(value = "/file/setHtml", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+   /* @PostMapping(value = "/file/Resource", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public String setCertificado(@RequestParam(value = "files", required = true) MultipartFile files) throws IOException{
         return pdfService.setCertificado(files,template) + " fue guardado con exito";
-    }
-    @GetMapping(value = "/file/setHtml")
-    public String getCertificado() throws IOException{
-       
+    }*/
+    @GetMapping(value = "/file/Resource")
+    public Set<String> getCertificado() throws IOException{  
         return pdfService.getCertificado(template);
     }
-    @GetMapping(value = "/file/DeletMedia")
+    @GetMapping(value = "/file/getListResource")
     public Set<String> getListFiles() throws IOException{
         return pdfService.getListFiles(template);
     }
