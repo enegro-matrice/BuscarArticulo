@@ -12,7 +12,9 @@ import com.itextpdf.text.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -63,16 +65,17 @@ public class TemplateResource {
         return pdfService.setCertificado(files,template) + " fue guardado con exito";
     }*/
     @GetMapping(value = "/file/Resource")
-    public Set<String> getCertificado() throws IOException{  
-        return pdfService.getCertificado(template);
+    public ResponseEntity<Set<String>> getCertificado() throws IOException{  
+        return ResponseEntity.accepted().body(pdfService.getCertificado(template));
+        //return new ResponseEntity<>(pdfService.getCertificado(template), HttpStatus.OK);
     }
     @GetMapping(value = "/file/getListResource")
-    public Set<String> getListFiles() throws IOException{
-        return pdfService.getListFiles(template);
+    public ResponseEntity<Set<String>> getListFiles() throws IOException{
+        return ResponseEntity.accepted().body(pdfService.getListFiles(template));
     }
     @PostMapping(value = "/file/DeletMedia")
-    public String DelMedia(@RequestParam(value = "name",required = true) String name) throws IOException{
-        return pdfService.deleteFiles(name, template);
+    public ResponseEntity<String> DelMedia(@RequestParam(value = "name",required = true) String name) throws IOException{
+        return ResponseEntity.accepted().body(pdfService.deleteFiles(name, template));
     }
   
 }

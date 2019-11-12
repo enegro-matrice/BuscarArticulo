@@ -123,8 +123,13 @@ public class PdfServiceImpl implements PdfService {
 	public String deleteFiles(String name, String template) throws IOException {
 		File fileToDelete = FileUtils.getFile(template + name);
 		try {
-			FileUtils.deleteQuietly(fileToDelete);
-			return name + " Eliminado";
+			boolean success = FileUtils.deleteQuietly(fileToDelete);
+			if(success){
+				return name + " Eliminado";
+			} else{
+				return " No se encontro el archivo";
+			}
+			
 		} catch (Exception e) {
 			return "No se pudo borrar el archivo";
 		}
