@@ -311,6 +311,11 @@
 			<artifactId>xmlworker</artifactId>
 			<version>5.5.10</version>
 		</dependency>
+        <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

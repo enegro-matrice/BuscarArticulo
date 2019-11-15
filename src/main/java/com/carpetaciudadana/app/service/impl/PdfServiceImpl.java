@@ -6,10 +6,12 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Writer;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+//import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,6 +19,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+
+import javax.annotation.Resource;
 
 import com.carpetaciudadana.app.service.PdfService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,6 +34,11 @@ import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.tool.xml.XMLWorkerHelper;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -46,6 +55,7 @@ import freemarker.template.TemplateExceptionHandler;
 @Service
 public class PdfServiceImpl implements PdfService {
 
+	private final Logger log = LoggerFactory.getLogger(PdfServiceImpl.class);
 	public File createHtmlWithData(String templateFile, String pathTemplates, String jsonData)
 			throws IOException, TemplateException {
 
@@ -89,13 +99,6 @@ public class PdfServiceImpl implements PdfService {
 		return pdfFile;
 	}
 
-	public File generatePDFFromBase64(String filename, String fileExt, String file) throws IOException {
-	//	File pdfFile = File.createTempFile(filename, fileExt);
-		//Files.write(Base64.decode(file), pdfFile);
-	//	return pdfFile;
-	return null;
-	}
-
 	public String savePNG(MultipartFile files, String template) throws IOException {
 		File file = new File(template, files.getOriginalFilename());
 		try (FileOutputStream f = new FileOutputStream(file)) {
@@ -109,14 +112,13 @@ public class PdfServiceImpl implements PdfService {
 
 	public Set<String> getListFiles(String template) throws IOException {
 		Set<String> fileList = new HashSet<>();
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(template))) {
-            for (Path path : stream) {
-                if (!Files.isDirectory(path)) {
-                    fileList.add(path.getFileName()
-						.toString());
-                }
-            }
-        }
+		try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(template))) {
+			for (Path path : stream) {
+				if (!Files.isDirectory(path)) {
+					fileList.add(path.getFileName().toString());
+				}
+			}
+		}
 		return fileList;
 	}
 
@@ -124,47 +126,21 @@ public class PdfServiceImpl implements PdfService {
 		File fileToDelete = FileUtils.getFile(template + name);
 		try {
 			boolean success = FileUtils.deleteQuietly(fileToDelete);
-			if(success){
+			if (success) {
 				return name + " Eliminado";
-			} else{
+			} else {
 				return " No se encontro el archivo";
 			}
-			
+
 		} catch (Exception e) {
 			return "No se pudo borrar el archivo";
 		}
-		
+
 	}
-
-/*	public String setCertificado(MultipartFile files, String template) throws IOException {
-		String name = "CERTIFICADO_CEDEL.ftl";
-		File file = new File(template, name);
-		try (FileOutputStream f = new FileOutputStream(file)) {
-			f.write(files.getBytes());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return files.getOriginalFilename();
-	}*/
-
-	public Set<String> getCertificado(String template) throws IOException {
-		Set<String> fileList = new HashSet<>();
-		String name = ".ftl";
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(template))) {
-            for (Path path : stream) {
-                if (!Files.isDirectory(path)) {
-					String pathh = path.getFileName().toString();
-					String result = pathh.substring(pathh.length() - 4);
-					//System.out.println(pathh);
-					//System.out.println(result);
-					if(result.equals(name)){
-						fileList.add(path.getFileName()
-						.toString());
-					}
-                }
-            }
-        }
-		return fileList;
+	public ByteArrayResource GetData(String name, String template) throws IOException {
+			File file = new File(template+name);
+			Path path = Paths.get(file.getAbsolutePath());
+			ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(path));
+			return resource;
 	}
-
 }
