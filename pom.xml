@@ -316,6 +316,27 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>
+        <!-- AWS -->
+        <dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk</artifactId>
+			<version>1.11.49</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.emc.vipr/s3-client -->
+		<dependency>
+			<groupId>com.emc.vipr</groupId>
+			<artifactId>s3-client</artifactId>
+			<version>2.0.3</version>
+		</dependency>
+        <!-- https://mvnrepository.com/artifact/org.springframework/spring-mock -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-mock</artifactId>
+            <version>2.0.8</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
