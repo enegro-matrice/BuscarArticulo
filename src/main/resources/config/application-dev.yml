@@ -116,3 +116,9 @@ jhipster:
 # application:
 app:
     template: F:/Carpeta-cuidadana/carpeta-ciudadana-template/src/main/resources/templates/xml/
+    s3:
+        accessKey: sdigital 
+        secretKey: J7p0Xo5nnwCOgdE8iwNnPzSxs8v2Y6ZmIsnMimEr 
+        endpoint:  https://s3-hml.gcba.gob.ar
+        port: 443
+        bucketName: resource

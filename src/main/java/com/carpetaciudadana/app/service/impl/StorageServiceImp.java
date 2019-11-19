@@ -1,19 +1,12 @@
 package com.carpetaciudadana.app.service.impl;
 
-import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
-import java.nio.file.Files;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Scope;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
+import com.amazonaws.services.s3.model.Bucket;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
@@ -21,8 +14,20 @@ import com.amazonaws.services.s3.model.PutObjectResult;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
+import com.amazonaws.util.IOUtils;
 import com.carpetaciudadana.app.domain.StorageConnection;
 import com.carpetaciudadana.app.service.StorageService;
+import com.carpetaciudadana.app.web.rest.errors.CustomParameterizedException;
+
+import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.core.JsonParseException;
+import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.JsonMappingException;
+//import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Servicios para guardar informacion en storage. Implementacion S3
@@ -32,6 +37,7 @@ import com.carpetaciudadana.app.service.StorageService;
 
 @Service
 public class StorageServiceImp implements StorageService {
+	private final Logger log = LoggerFactory.getLogger(StorageServiceImp.class);
 	// properties
 	@Value("${app.s3.accessKey}")
 	private String accessKey;
@@ -51,29 +57,67 @@ public class StorageServiceImp implements StorageService {
 	/**
 	 * Agrega un archivo en el bucket
 	 */
-	public PutObjectResult put(File file, Boolean isPublic) {
-		PutObjectRequest objectRequest = new PutObjectRequest(bucketName, file.getName(), file);
+	public String put(MultipartFile file, Boolean isPublic) throws IOException {
+		log.debug("Add File : "+file.getOriginalFilename());
+		String extension = FilenameUtils.getExtension(file.getOriginalFilename());
+		File convFile =  File.createTempFile(file.getName(),extension);
+		log.debug(file.getName()+ "   415465    " +extension);
+		FileOutputStream fos = new FileOutputStream(convFile); 
+		fos.write(file.getBytes());
+		PutObjectRequest objectRequest = new PutObjectRequest(bucketName, file.getOriginalFilename(), convFile);
 		if (isPublic)
 			objectRequest.withCannedAcl(CannedAccessControlList.PublicRead);
-
-		return StorageConnection.getInstance(accessKey, secretKey, endpoint, port).getClient().putObject(objectRequest);
+		StorageConnection.getInstance(accessKey, secretKey, endpoint, port).getClient().putObject(objectRequest);
+		return file.getOriginalFilename();
 	}
 
 	/** devuelve archivos del bucket */
-	public List<S3ObjectSummary> getFrom() {
+	public List<S3ObjectSummary> getFrom() throws IOException{
+		log.debug("Get list file : ");
 		return StorageConnection.getInstance(accessKey, secretKey, endpoint, port).getClient().listObjects(bucketName).getObjectSummaries();
 	}
 
 	/***devuelve el archivo del bucket*/
-	public InputStream getObject(String fileName) throws IOException {
-		S3Object fetchFile = StorageConnection.getInstance(accessKey, secretKey, endpoint, port).getClient()
-				.getObject(new GetObjectRequest(bucketName, fileName));
-		final BufferedInputStream i = new BufferedInputStream(fetchFile.getObjectContent());
-		InputStream objectData = fetchFile.getObjectContent();
-		MultipartFile file= new MockMultipartFile(fileName.concat(".pdf"),fileName.concat(".pdf"), "application/pdf", objectData);
-		objectData.close();
-		
-		return new BufferedInputStream(file.getInputStream());
+	public byte[] getObject(String fileName) throws IOException {
+		log.debug("Get file : "+fileName);
+		if(StorageConnection.getInstance(accessKey, secretKey, endpoint, port).getClient().doesObjectExist(bucketName, fileName)){
+			S3Object fetchFile = StorageConnection.getInstance(accessKey, secretKey, endpoint, port).getClient().getObject(new GetObjectRequest(bucketName, fileName));
+			S3ObjectInputStream stream = fetchFile.getObjectContent();
+			try {
+				byte[] content = IOUtils.toByteArray(stream);
+				fetchFile.close();
+				return content;
+			} catch (IOException e) {
+				throw new CustomParameterizedException(fileName + " Error a cargar");
+			}
+		}else{
+			throw new CustomParameterizedException(fileName + " No existe");
+		}
 	}
+
+
+	public Bucket createBucket(String fileName) throws IOException {
+		log.debug("Create bucket : "+fileName);
+		if (StorageConnection.getInstance(accessKey, secretKey, endpoint, port).getClient().doesBucketExist(bucketName)){
+			throw new CustomParameterizedException(fileName + " Ya existe el Bucket");
+		}else{
+			return StorageConnection.getInstance(accessKey, secretKey, endpoint, port).getClient().createBucket(fileName);
+		}
+
+	}
+
+
+	public Boolean delecFile(String fileName) throws IOException {
+		log.debug("Delect file : "+fileName);
+		if (StorageConnection.getInstance(accessKey, secretKey, endpoint, port).getClient().doesObjectExist(bucketName, fileName)){
+			StorageConnection.getInstance(accessKey, secretKey, endpoint, port).getClient().deleteObject(bucketName, fileName);
+			return true;
+		}else{
+			throw new CustomParameterizedException(fileName + " El objeto no existe");
+		}
+
+		
+	}
+	
 
 }

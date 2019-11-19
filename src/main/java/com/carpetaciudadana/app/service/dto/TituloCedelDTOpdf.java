@@ -2,10 +2,6 @@ package com.carpetaciudadana.app.service.dto;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.time.LocalDate;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.carpetaciudadana.app.domain.EstudianteCedel;
 import com.carpetaciudadana.app.web.rest.util.Funciones;
@@ -13,6 +9,9 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TituloCedelDTOpdf implements Serializable {
 
@@ -76,7 +75,7 @@ public class TituloCedelDTOpdf implements Serializable {
 					+ "\"" + getNumeroEnLetras() + "\", \"path\": " + "\"" + getPath() + "\"}";
 
 		} catch (JsonProcessingException e) {
-			// TODO Crear servicio template pdf
+			
 			log.warn("Json Parse Exception: No se pudo serializar Titulo Cedel DTO");
 			return "Json Parse Error";
 		}

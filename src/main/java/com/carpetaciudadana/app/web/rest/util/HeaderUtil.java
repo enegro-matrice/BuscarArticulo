@@ -1,5 +1,8 @@
 package com.carpetaciudadana.app.web.rest.util;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -41,5 +44,10 @@ public final class HeaderUtil {
         headers.add("X-" + APPLICATION_NAME + "-error", defaultMessage);
         headers.add("X-" + APPLICATION_NAME + "-params", entityName);
         return headers;
+    }
+    public static Map<String, Object> successMsj(String msj){
+        Map<String, Object> data = new HashMap<>();
+        data.put("mensaje", msj);   
+        return data;
     }
 }

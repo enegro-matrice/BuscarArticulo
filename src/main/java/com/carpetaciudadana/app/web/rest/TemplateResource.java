@@ -4,14 +4,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Set;
 
-import javax.annotation.Resource;
-
 import com.carpetaciudadana.app.domain.EstudianteCedel;
 import com.carpetaciudadana.app.service.PdfService;
 import com.carpetaciudadana.app.service.dto.TituloCedelDTOpdf;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.google.common.io.Resources;
 import com.hazelcast.com.eclipsesource.json.ParseException;
 import com.itextpdf.text.DocumentException;
 

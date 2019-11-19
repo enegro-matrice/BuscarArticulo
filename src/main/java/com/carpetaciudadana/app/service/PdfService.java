@@ -4,10 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 
-import javax.annotation.Resource;
-
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.google.common.io.Resources;
 import com.itextpdf.text.DocumentException;
 
 import org.springframework.boot.json.JsonParseException;

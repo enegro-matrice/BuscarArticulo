@@ -1,17 +1,16 @@
 package com.carpetaciudadana.app.domain;
 
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.emc.vipr.services.s3.ViPRS3Client;
+
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 
 @Component
 public class StorageConnection {
-	// TODO : externalizar a properties
+	
 	private BasicAWSCredentials creds;
 	private ViPRS3Client client;
 	
